@@ -1,3 +1,4 @@
+using Core.Interfaces;
 using InfraStructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<StoreContext>(c => c.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnetion")));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
@@ -25,5 +27,18 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+try
+{
+    var contextService = app.Services.CreateScope();
+    var context = contextService.ServiceProvider.GetRequiredService<StoreContext>();
+    await context.Database.MigrateAsync();
+    await StoreContextSeed.SeedAsync(context, loggerFactory);
+}
+catch (Exception ex)
+{   
+    var logger = loggerFactory.CreateLogger<Program>();
+    logger.LogError(ex, "An error accuired during migrations.");
+}
 
 app.Run();
