@@ -2,21 +2,20 @@ using System.Text.Json;
 using Core.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace InfraStructure.Data
+namespace InfraStructure.Data;
+public class StoreContextSeed
 {
-    public class StoreContextSeed
+    public static async Task SeedAsync(StoreContext context, ILoggerFactory loggerFactory)
     {
-        public static async Task SeedAsync(StoreContext context, ILoggerFactory loggerFactory)
+        try
         {
-            try
-            {
-                if (!context.ProductBrands.Any())
+            if (!context.ProductBrands.Any())
             {
                 var brandDate = File.ReadAllText("../InfraStructure/Data/SeedData/brands.json");
                 var brands = JsonSerializer.Deserialize<List<ProductBrand>>(brandDate);
                 foreach (var item in brands)
                 {
-                    context.ProductBrands.Add(item);     
+                    context.ProductBrands.Add(item);
                 }
                 await context.SaveChangesAsync();
             }
@@ -27,7 +26,7 @@ namespace InfraStructure.Data
                 var types = JsonSerializer.Deserialize<List<ProductType>>(typeDate);
                 foreach (var item in types)
                 {
-                    context.ProductTypes.Add(item);     
+                    context.ProductTypes.Add(item);
                 }
                 await context.SaveChangesAsync();
             }
@@ -38,17 +37,16 @@ namespace InfraStructure.Data
                 var products = JsonSerializer.Deserialize<List<Product>>(productDate);
                 foreach (var item in products)
                 {
-                    context.Products.Add(item);     
+                    context.Products.Add(item);
                 }
                 await context.SaveChangesAsync();
             }
-            }
-            catch (Exception ex)
-            {
-                var logger = loggerFactory.CreateLogger<StoreContextSeed>();
-                logger.LogError(ex.Message);
-            }
-            
         }
+        catch (Exception ex)
+        {
+            var logger = loggerFactory.CreateLogger<StoreContextSeed>();
+            logger.LogError(ex.Message);
+        }
+
     }
 }
