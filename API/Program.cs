@@ -31,6 +31,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseStaticFiles();
 var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 try
 {
