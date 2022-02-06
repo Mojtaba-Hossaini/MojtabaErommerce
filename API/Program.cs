@@ -1,30 +1,27 @@
+using API.Exctensions;
 using API.Helpers;
-using Core.Interfaces;
+using API.Middleware;
 using InfraStructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddAutoMapper(typeof(MappingProfiles));
-builder.Services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
+
 
 builder.Services.AddDbContext<StoreContext>(c => c.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnetion")));
-
+builder.AddApplicationServices();
+builder.AddSwaggerDocumention();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseMiddleware<ExceptionMiddleware>();
+app.UserSwaggerDocumention();
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 app.UseHttpsRedirection();
 
@@ -41,7 +38,7 @@ try
     await StoreContextSeed.SeedAsync(context, loggerFactory);
 }
 catch (Exception ex)
-{   
+{
     var logger = loggerFactory.CreateLogger<Program>();
     logger.LogError(ex, "An error accuired during migrations.");
 }
