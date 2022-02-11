@@ -8,7 +8,7 @@ public static class SwaggerServiceExctensions
         return builder;
     }
 
-    public static WebApplication UserSwaggerDocumention(this WebApplication app)
+    public static WebApplication UseSwaggerDocumention(this WebApplication app)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
