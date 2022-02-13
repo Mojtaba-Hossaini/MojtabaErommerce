@@ -6,7 +6,7 @@ public class ProductWithTypeAndBrandSpecification : BaseSpecification<Product>
 {
     public ProductWithTypeAndBrandSpecification(ProductSpecParams productParam)
     : base(c => 
-    (!string.IsNullOrEmpty(productParam.Search) || c.Name.ToLower().Contains(productParam.Search))&&
+    (string.IsNullOrEmpty(productParam.Search) || c.Name.ToLower().Contains(productParam.Search))&&
     (!productParam.BrandId.HasValue || c.ProductBrandId == productParam.BrandId) &&
     (!productParam.TypeId.HasValue || c.ProductTypeId == productParam.TypeId))
     {
